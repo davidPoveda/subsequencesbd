@@ -1,6 +1,9 @@
 package com.dpoveda.servicio.subsequencesbd.subsequencesbd.services;
 
+import com.dpoveda.servicio.subsequencesbd.subsequencesbd.model.Subsequences;
+import com.dpoveda.servicio.subsequencesbd.subsequencesbd.repository.SubsequencesBDRepository;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,6 +14,9 @@ public class SubsequencesBDService {
 
     private static final Integer VALOR_MINIMO_COINCIDENCIAS = 0;
     private static final Integer VALOR_CONSTANTE_POSICION = 1;
+
+    @Autowired
+    private SubsequencesBDRepository subsequencesBDRepository;
 
     /**
      * Calcula la cantidad de subsecuencias del atributo textoABuscar dentro del atributo textoBase.
@@ -23,6 +29,15 @@ public class SubsequencesBDService {
         // se adiciona validacion para evitar nullpointerexcepcion
         if (Strings.isBlank(textoBase) || Strings.isBlank(textoABuscar)) {
             return VALOR_MINIMO_COINCIDENCIAS;
+        }
+
+        // se buscan los registros que existan en base de datos y que cumplan las dos condiciones
+        Subsequences subsequencesReturn = null;
+        if (textoBase.length() < 50 || textoABuscar.length() < 50) {
+            subsequencesReturn = subsequencesBDRepository.findBySubsequencesABuscar(textoBase, textoABuscar).get(0);
+            if (subsequencesReturn == null) {
+                return subsequencesReturn.getCantidad();
+            }
         }
         int x = textoBase.length();
         int y = textoABuscar.length();
@@ -37,6 +52,12 @@ public class SubsequencesBDService {
                 }
             }
         }
+        // se almacena los datos en BBDD
+        Subsequences subsequencias = new Subsequences();
+        subsequencias.setSecuenciaBase(textoBase);
+        subsequencias.setSecuenciaBusqueda(textoABuscar);
+        subsequencias.setCantidad(arreglo[x][y]);
+        subsequencesBDRepository.save(subsequencias);
         return arreglo[x][y];
     }
 
