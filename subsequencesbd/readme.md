@@ -56,6 +56,16 @@ Cuando termina de procesar los dos atributos y de identificar las cantidades de 
 
 La aplicación esta creada en spring boot versión 2.6.3, usando la versión de Java 11, se utiliza MAVEN en su versión 3.x.x.
 El desarrollo se realizo con la ayuda del IDE Intellij IDE versión 2024.3.4.
+
+Se genero un contenedor de la solución JAVA en Docker, realizando la siguiente operación:
+
+1. Se creo el archivo Dockerfile a través de la opción de menú New-> Dockerfile del proyecto.
+2. Se realizo la configuración correspondiente a la versión de JAVA 11, el puerto por donde se va a publicar y la definición de ser un .jar.
+3. Se ejecuto el comando mvn clean package al proyecto.
+4. Se ejecuto en la consola de Git bachs el siguiente comando encargado de crear la imagen correspondiente a la aplicación  docker build -t mauricio-poveda . 
+
+
+
 Un ejemplo de la forma de usar el servicio es el siguiente:
 
 http://localhost:8080/subsequences/algoritmo/rabbbit/rabbit
