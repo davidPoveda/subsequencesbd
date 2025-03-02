@@ -34,16 +34,26 @@ public class SubsequencesBDService {
         }
 
         // se buscan los registros que existan en base de datos y que cumplan las dos condiciones
-        Subsequences subsequencesReturn = null;
         if (textoBase.length() < 50 || textoABuscar.length() < 50) {
-            // metodo
-            List<Subsequences> lista = subsequencesBDRepository.findBySubsequencesABuscar(textoBase, textoABuscar);
-            subsequencesReturn = lista != null && !lista.isEmpty() ? lista.get(0) : null;
+            // se realiza la busqueda de la subsequences si ya existe
+            Subsequences subsequencesReturn = consultarSubsequenceList(textoBase, textoABuscar);
             if (subsequencesReturn != null) {
                 return subsequencesReturn.getCantidad();
             }
         }
+        int cantidadSubsequences = calcularCantidadSubsequences(textoBase, textoABuscar);
+        // se almacena los datos en BBDD paso a metodo
+        almacenarRegistroSubsequence(textoBase,textoABuscar, cantidadSubsequences);
+        return cantidadSubsequences;
+    }
 
+    /**
+     * Metodo encargado de realizar el calculo de la cantidad de subsequences
+     * @param textoBase
+     * @param textoABuscar
+     * @return
+     */
+    private int calcularCantidadSubsequences(String textoBase, String textoABuscar) {
         int x = textoBase.length();
         int y = textoABuscar.length();
         int[][] arreglo = inicializarMatriz(x,y);
@@ -57,13 +67,32 @@ public class SubsequencesBDService {
                 }
             }
         }
-        // se almacena los datos en BBDD paso a metodo
+        return arreglo[x][y];
+    }
+
+    /**
+     * Metodo encargado de almacenar el registro subsequences
+     * @param textoBase
+     * @param textoABuscar
+     * @param valor
+     */
+    private void almacenarRegistroSubsequence(String textoBase, String textoABuscar, int valor) {
         Subsequences subsequencias = new Subsequences();
         subsequencias.setSecuenciaBase(textoBase);
         subsequencias.setSecuenciaBusqueda(textoABuscar);
-        subsequencias.setCantidad(arreglo[x][y]);
+        subsequencias.setCantidad(valor);
         subsequencesBDRepository.save(subsequencias);
-        return arreglo[x][y];
+    }
+
+    /**
+     * Metodo encargado de recuperar la subsequeces si existe para los datos de entrada
+     * @param textoBase
+     * @param textoABuscar
+     * @return
+     */
+    private Subsequences consultarSubsequenceList(String textoBase, String textoABuscar) {
+        List<Subsequences> lista = subsequencesBDRepository.findBySubsequencesABuscar(textoBase, textoABuscar);
+        return lista != null && !lista.isEmpty() ? lista.get(0) : null;
     }
 
     /**
