@@ -6,6 +6,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Servicio para manejar subsecuencias.
  */
@@ -34,15 +36,18 @@ public class SubsequencesBDService {
         // se buscan los registros que existan en base de datos y que cumplan las dos condiciones
         Subsequences subsequencesReturn = null;
         if (textoBase.length() < 50 || textoABuscar.length() < 50) {
-            subsequencesReturn = subsequencesBDRepository.findBySubsequencesABuscar(textoBase, textoABuscar).get(0);
-            if (subsequencesReturn == null) {
+            // metodo
+            List<Subsequences> lista = subsequencesBDRepository.findBySubsequencesABuscar(textoBase, textoABuscar);
+            subsequencesReturn = lista != null && !lista.isEmpty() ? lista.get(0) : null;
+            if (subsequencesReturn != null) {
                 return subsequencesReturn.getCantidad();
             }
         }
+
         int x = textoBase.length();
         int y = textoABuscar.length();
         int[][] arreglo = inicializarMatriz(x,y);
-        // se recorren la matriz a partir de los valores ingresados
+        // se recorren la matriz a partir de los valores ingresados prueba de escritorio
         for (int i = 1; i <= x; i++) {
             for (int j = 1; j <= y; j++) {
                 if (textoBase.charAt(i - VALOR_CONSTANTE_POSICION) == textoABuscar.charAt(j - VALOR_CONSTANTE_POSICION)) {
@@ -52,7 +57,7 @@ public class SubsequencesBDService {
                 }
             }
         }
-        // se almacena los datos en BBDD
+        // se almacena los datos en BBDD paso a metodo
         Subsequences subsequencias = new Subsequences();
         subsequencias.setSecuenciaBase(textoBase);
         subsequencias.setSecuenciaBusqueda(textoABuscar);
